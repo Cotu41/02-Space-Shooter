@@ -1,0 +1,136 @@
+[gd_scene load_steps=16 format=2]
+
+[ext_resource path="res://spaceshooter/PNG/Enemies/enemyBlue1.png" type="Texture" id=1]
+[ext_resource path="res://back.png" type="Texture" id=2]
+[ext_resource path="res://Player.gd" type="Script" id=3]
+[ext_resource path="res://Laser.tscn" type="PackedScene" id=4]
+[ext_resource path="res://EnemySpawner.gd" type="Script" id=5]
+[ext_resource path="res://Enemy.tscn" type="PackedScene" id=6]
+[ext_resource path="res://ScoreText.gd" type="Script" id=7]
+[ext_resource path="res://GameOverText.gd" type="Script" id=8]
+[ext_resource path="res://ChargeMeter.gd" type="Script" id=9]
+[ext_resource path="res://ChargeText.gd" type="Script" id=10]
+[ext_resource path="res://spaceshooter/PNG/Lasers/laserGreen06.png" type="Texture" id=11]
+[ext_resource path="res://ChargeLaser.gd" type="Script" id=12]
+
+[sub_resource type="CircleShape2D" id=1]
+
+[sub_resource type="CapsuleShape2D" id=2]
+height = 577.989
+
+[sub_resource type="Gradient" id=3]
+colors = PoolColorArray( 1, 1, 1, 1, 0, 0.484375, 1, 1 )
+
+[node name="Main" type="Node2D"]
+position = Vector2( 95.8916, 8.98987 )
+
+[node name="back" type="Sprite" parent="."]
+position = Vector2( 270.158, 480.903 )
+rotation = 1.5708
+scale = Vector2( 0.48112, 0.48112 )
+texture = ExtResource( 2 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Player" type="Node2D" parent="."]
+position = Vector2( 288.733, 876.042 )
+script = ExtResource( 3 )
+__meta__ = {
+"_edit_group_": true
+}
+_laser_scene = ExtResource( 4 )
+
+[node name="ShipGraphic" type="Sprite" parent="Player"]
+scale = Vector2( 0.75, 0.75 )
+texture = ExtResource( 1 )
+flip_v = true
+
+[node name="Area2D" type="Area2D" parent="Player"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player/Area2D"]
+position = Vector2( 0, 10 )
+scale = Vector2( 4, 3 )
+shape = SubResource( 1 )
+
+[node name="ChargeLaser" type="Node2D" parent="Player"]
+script = ExtResource( 12 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="BeamGraphic" type="Sprite" parent="Player/ChargeLaser"]
+position = Vector2( 1.74033, -346.207 )
+scale = Vector2( 1, 10.455 )
+texture = ExtResource( 11 )
+
+[node name="Area2D" type="Area2D" parent="Player/ChargeLaser"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player/ChargeLaser/Area2D"]
+position = Vector2( 0, -350 )
+shape = SubResource( 2 )
+
+[node name="Timer" type="Timer" parent="Player/ChargeLaser"]
+wait_time = 5.0
+one_shot = true
+
+[node name="EnemySpawner" type="Node2D" parent="."]
+position = Vector2( -65.4063, -7.13525 )
+script = ExtResource( 5 )
+_enemy_scene = ExtResource( 6 )
+
+[node name="Timer" type="Timer" parent="EnemySpawner"]
+wait_time = 2.0
+autostart = true
+
+[node name="ScoreText" type="Label" parent="."]
+margin_left = 11.8108
+margin_top = 887.568
+margin_right = 78.8108
+margin_bottom = 927.568
+rect_scale = Vector2( 1.5, 1.5 )
+text = "SCORE:"
+script = ExtResource( 7 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="GameOverText" type="Label" parent="."]
+visible = false
+margin_left = 15.0
+margin_top = 123.0
+margin_right = 100.0
+margin_bottom = 137.0
+rect_scale = Vector2( 6, 6 )
+text = "GAME OVER"
+script = ExtResource( 8 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ChargeMeter" type="Node2D" parent="."]
+light_mask = 0
+position = Vector2( 213.947, 939.182 )
+script = ExtResource( 9 )
+
+[node name="ChargeText" type="Label" parent="ChargeMeter"]
+margin_left = 219.438
+margin_top = -51.6137
+margin_right = 286.438
+margin_bottom = -11.6137
+rect_scale = Vector2( 1.5, 1.5 )
+text = "CHARGE:"
+script = ExtResource( 10 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Line2D" type="Line2D" parent="ChargeMeter"]
+visible = false
+position = Vector2( -1.10641, 0 )
+scale = Vector2( 0.889717, 1 )
+points = PoolVector2Array( 190.241, 1.01105, -0.032486, 1.01111 )
+gradient = SubResource( 3 )
+[connection signal="area_entered" from="Player/Area2D" to="Player" method="_on_Area2D_area_entered"]
+[connection signal="timeout" from="Player/ChargeLaser/Timer" to="Player/ChargeLaser" method="_stopfiring"]
+[connection signal="timeout" from="EnemySpawner/Timer" to="EnemySpawner" method="spawn_enemy"]
